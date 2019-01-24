@@ -55,6 +55,7 @@ class OscillatorsController < ApplicationController
     id = params[:id]
     param_name = params[:param_name]
     value = params[:value]
+    logger.debug value
     oscillator = Oscillator.find(id)
 
     if oscillator.update_attribute(param_name, value)

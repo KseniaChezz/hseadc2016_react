@@ -10,7 +10,7 @@ export default class Oscillators extends React.Component {
     let oscillators = []
 
     props.oscillators.map(oscillator => {
-      oscillator.play = false
+      oscillator.playing = false
       oscillators.push(oscillator)
     })
 
@@ -18,25 +18,18 @@ export default class Oscillators extends React.Component {
       oscillators: oscillators
     }
 
-    this.handleDownClick = this.handleDownClick.bind(this)
-    this.handleUpClick = this.handleUpClick.bind(this)
-    this.handlePlayClick = this.handlePlayClick.bind(this)
+    this.handlePlayOrStopClick = this.handlePlayOrStopClick.bind(this)
+    this.handleFrequencyChange = this.handleFrequencyChange.bind(this)
+    this.handleWaveChange      = this.handleWaveChange.bind(this)
+    this.handleMouseUp         = this.handleMouseUp.bind(this)
   }
 
-  handleDownClick(index) {
-    this.updateFrequency(index, 'down')
-  }
-
-  handleUpClick(index) {
-    this.updateFrequency(index, 'up')
-  }
-
-  handlePlayClick(index) {
+  handlePlayOrStopClick(index) {
     let { oscillators } = this.state
 
     oscillators.map ((oscillator, i) => {
       if (index == i) {
-        oscillator.play = !oscillator.play
+        oscillator.playing = !oscillator.playing
       }
     })
 
@@ -45,15 +38,50 @@ export default class Oscillators extends React.Component {
     })
   }
 
-  updateFrequency(index, actionType) {
+  handleFrequencyChange(index, value) {
     let { oscillators } = this.state
 
     oscillators.map ((oscillator, i) => {
       if (index == i) {
-        if (actionType == 'down') { oscillator.frequency--}
-        if (actionType == 'up')   { oscillator.frequency++}
+        oscillator.frequency = value
+      }
+    })
 
-        const { id, frequency } = oscillator
+    this.setState({
+      oscillators: oscillators
+    })
+  }
+
+  handleWaveChange(index, value) {
+    let { oscillators } = this.state
+
+    oscillators.map ((oscillator, i) => {
+      if (index == i) {
+        oscillator.wave = value
+      }
+    })
+
+    this.setState({
+      oscillators: oscillators
+    })
+  }
+
+  handleMouseUp(index) {
+    const frequency = this.state.oscillators[index].frequency
+    console.log("frequency", index, frequency)
+    this.updateFrequency(index, frequency)
+  }
+
+  updateFrequency(index, frequency) {
+    let { oscillators } = this.state
+
+    oscillators.map ((oscillator, i) => {
+      if (index == i) {
+        // oscillator.frequency = frequency
+        // if (actionType == 'down') { oscillator.frequency--}
+        // if (actionType == 'up')   { oscillator.frequency++}
+
+        const { id } = oscillator
 
         $.ajax({
             dataType: "json",
@@ -73,9 +101,9 @@ export default class Oscillators extends React.Component {
       }
     })
 
-    this.setState({
-      oscillators: oscillators
-    })
+    // this.setState({
+    //   oscillators: oscillators
+    // })
   }
 
   render() {
@@ -86,9 +114,10 @@ export default class Oscillators extends React.Component {
       oscillatorElements.push(
         <Oscillator
           {...oscillator}
-          handleDownClick={ this.handleDownClick }
-          handleUpClick={ this.handleUpClick }
-          handlePlayClick={ this.handlePlayClick }
+          handleMouseUp={ this.handleMouseUp }
+          handlePlayOrStopClick={ this.handlePlayOrStopClick }
+          handleFrequencyChange={ this.handleFrequencyChange }
+          handleWaveChange={ this.handleWaveChange }
           index= { i }
           key={ i }
         />
